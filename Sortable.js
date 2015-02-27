@@ -265,6 +265,9 @@
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
 			var self = this;
 			var longPressDelay = 500; // TODO : make that a parameter
+			_on(document, 'mouseup', this._cancelDrag);
+			_on(document, 'touchend', this._cancelDrag);
+			_on(document, 'touchcancel', this._cancelDrag);
 			this._longPressTimeout = window.setTimeout(function() {
 				self._startDrag(evt);
 			}, longPressDelay);
@@ -369,6 +372,12 @@
 					}
 				} catch (err) {
 				}
+			}
+		},
+
+		_cancelDrag: function() {
+			if(this._longPressTimeout) {
+				window.clearTimeout(this._longPressTimeout);
 			}
 		},
 
@@ -631,10 +640,6 @@
 		},
 
 		_onDrop: function (/**Event*/evt) {
-			if(this._longPressTimeout) {
-				window.clearTimeout(this._longPressTimeout);
-			}
-
 			var el = this.el,
 				options = this.options;
 
