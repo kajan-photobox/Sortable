@@ -263,6 +263,14 @@
 
 
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
+			var self = this;
+			var longPressDelay = 500; // TODO : make that a parameter
+			this._longPressTimeout = window.setTimeout(function() {
+				self._startDrag(evt);
+			}, longPressDelay);
+		},
+
+		_startDrag: function(/**Event|TouchEvent*/evt) {
 			var type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
@@ -623,6 +631,10 @@
 		},
 
 		_onDrop: function (/**Event*/evt) {
+			if(this._longPressTimeout) {
+				window.clearTimeout(this._longPressTimeout);
+			}
+
 			var el = this.el,
 				options = this.options;
 
