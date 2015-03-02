@@ -180,6 +180,7 @@
 			scrollSpeed: 10,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 			ghostClass: 'sortable-ghost',
+			dragClass: 'drag-class',
 			ignore: 'a, img',
 			filter: null,
 			animation: 0,
@@ -188,6 +189,7 @@
 			},
 			dropBubble: false,
 			dragoverBubble: false,
+			longPressMode: false,
 			holdThresholdDelay: 500
 		};
 
@@ -254,6 +256,7 @@
 			if (rootEl && dragEl) {
 				// Apply effect
 				_toggleClass(dragEl, this.options.ghostClass, true);
+				_toggleClass(ghostEl, this.options.dragClass, true);
 
 				Sortable.active = this;
 
@@ -264,29 +267,33 @@
 
 
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
-			var self = this,
-				touch = evt.touches && evt.touches[0],
-				target = (touch || evt).target,
-				options =  this.options,
-				el = this.el;
+			if(this.options.longPressMode) {
+				var self = this,
+					touch = evt.touches && evt.touches[0],
+					target = (touch || evt).target,
+					options =  this.options,
+					el = this.el;
 
-			tapEvt = evt;
-			target = _closest(target, options.draggable, el);
+				tapEvt = evt;
+				target = _closest(target, options.draggable, el);
 
-			if (touch) {
-				// Touch device support
-				tapEvt = {
-					target: target,
-					clientX: touch.clientX,
-					clientY: touch.clientY
-				};
+				if (touch) {
+					// Touch device support
+					tapEvt = {
+						target: target,
+						clientX: touch.clientX,
+						clientY: touch.clientY
+					};
+				}
+
+				this._bindThresholdCheckings();
+
+				this._longPressTimeout = window.setTimeout(function() {
+					self._startDrag(evt);
+				}, options.holdThresholdDelay);
+			} else {
+				this._startDrag(evt);
 			}
-
-			this._bindThresholdCheckings();
-
-			this._longPressTimeout = window.setTimeout(function() {
-				self._startDrag(evt);
-			}, options.holdThresholdDelay);
 		},
 
 
@@ -423,9 +430,6 @@
 				var touch = evt.touches ? evt.touches[0] : evt,
 					dx = Math.abs(touch.clientX - tapEvt.clientX),
 					dy = Math.abs(touch.clientY - tapEvt.clientY);
-
-				console.log('dx : ' + dx);
-				console.log('dy : ' + dy);
 
 				if(dx > dxMax || dy > dyMax) {
 					this._cancelDrag();
@@ -726,6 +730,7 @@
 
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
+					_toggleClass(ghostEl, this.options.dragClass, false);
 
 					if (rootEl !== dragEl.parentNode) {
 						newIndex = _index(dragEl);
