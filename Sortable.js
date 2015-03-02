@@ -187,7 +187,8 @@
 				dataTransfer.setData('Text', dragEl.textContent);
 			},
 			dropBubble: false,
-			dragoverBubble: false
+			dragoverBubble: false,
+			holdThresholdDelay: 500
 		};
 
 
@@ -264,7 +265,6 @@
 
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
 			var self = this,
-				longPressDelay = 500, // TODO : make that a parameter
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
 				options =  this.options,
@@ -286,7 +286,7 @@
 
 			this._longPressTimeout = window.setTimeout(function() {
 				self._startDrag(evt);
-			}, longPressDelay);
+			}, options.holdThresholdDelay);
 		},
 
 
