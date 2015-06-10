@@ -1071,7 +1071,7 @@
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
 		while (el && (el = el.previousElementSibling)) {
-			if (el.nodeName.toUpperCase() !== 'TEMPLATE') {
+			if (el.nodeName.toUpperCase() !== 'TEMPLATE' && el.nodeName.toUpperCase() !== 'HR') {
 				index++;
 			}
 		}
