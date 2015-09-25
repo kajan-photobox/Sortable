@@ -34,7 +34,8 @@
 		onUpdate: 'handleUpdate',
 		onRemove: 'handleRemove',
 		onSort: 'handleSort',
-		onFilter: 'handleFilter'
+		onFilter: 'handleFilter',
+		onMove: 'handleMove'
 	};
 
 
@@ -90,7 +91,7 @@
 
 
 			// Bind callbacks so that "this" refers to the component
-			'onStart onEnd onAdd onSort onUpdate onRemove onFilter'.split(' ').forEach(function (/** string */name) {
+			'onStart onEnd onAdd onSort onUpdate onRemove onFilter onMove'.split(' ').forEach(function (/** string */name) {
 				copyOptions[name] = function (evt) {
 					if (name === 'onStart') {
 						_nextSibling = evt.item.nextElementSibling;
@@ -134,6 +135,16 @@
 			this._sortableInstance = Sortable.create((this.refs[options.ref] || this).getDOMNode(), copyOptions);
 		},
 
+		componentWillReceiveProps: function (nextProps) {
+			var newState = {},
+				modelName = _getModelName(this),
+				items = nextProps[modelName];
+
+			if (items) {
+				newState[modelName] = items;
+				this.setState(newState);
+			}
+		},
 
 		componentWillUnmount: function () {
 			this._sortableInstance.destroy();
